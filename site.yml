@@ -1,0 +1,24 @@
+---
+# Server1 :DNS
+- name: Configure DNS Server
+  hosts: server1
+  become: yes
+  roles:
+    - role: mydns
+      tasks_from: dns.yml
+# server1: FTP
+- name: Configure FTP Server
+  hosts: server1
+  become: yes
+  roles:
+    - role: myftp
+      tasks_from: main.yml
+
+# resolv.conf는 모든 서버에 적용
+- name: Configure resolv.conf
+  hosts: localhost,server1,ansible1
+  become: yes
+  roles:
+    - role: mydns
+      tasks_from: resolv.yml
+

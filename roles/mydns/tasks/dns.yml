@@ -1,0 +1,92 @@
+---
+# server1 전용: DNS 서버 설정
+- block:
+    - name: Install BIND packages
+      yum:
+        name:
+          - bind
+          - bind-utils
+        state: present
+
+    - name: Enable and start named service
+      systemd:
+        name: named
+        enabled: yes
+        state: started
+
+    - name: Set listen-on port 53 to any
+      lineinfile:
+        path: /etc/named.conf
+        regexp: 'listen-on port 53'
+        line: 'listen-on port 53 { any; };'
+        backrefs: yes
+
+    - name: Set listen-on-v6 port 53 to any
+      lineinfile:
+        path: /etc/named.conf
+        regexp: 'listen-on-v6 port 53'
+        line: 'listen-on-v6 port 53 { any; };'
+        backrefs: yes
+
+    - name: Set allow-query to any
+      lineinfile:
+        path: /etc/named.conf
+        regexp: 'allow-query'
+        line: 'allow-query { any; };'
+        backrefs: yes
+
+    - name: Enable recursion
+      lineinfile:
+        path: /etc/named.conf
+        regexp: 'recursion'
+        line: 'recursion yes;'
+        backrefs: yes
+
+    - name: Insert forwarders inside options block
+      blockinfile:
+        path: /etc/named.conf
+        insertafter: '^\s*recursion yes;'
+        marker: "# {mark} ANSIBLE MANAGED FORWARDERS"
+        block: |
+          forwarders { 8.8.8.8; };
+          forward only;
+
+    - name: Add DNS zones block to named.rfc1912.zones
+      blockinfile:
+        path: /etc/named.rfc1912.zones
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - DNS zones"
+        block: |
+          zone "example.com" IN {
+              type master;
+              file "example.com.zone";
+              allow-update { none; };
+          };
+          zone "20.168.192.in-addr.arpa" IN {
+              type master;
+              file "example.com.rev";
+              allow-update { none; };
+          };
+
+    - name: Deploy forward zone file
+      copy:
+        src: example.com.zone
+        dest: /var/named/example.com.zone
+        owner: root
+        group: named
+        mode: '0644'
+
+    - name: Deploy reverse zone file
+      copy:
+        src: example.com.rev
+        dest: /var/named/example.com.rev
+        owner: root
+        group: named
+        mode: '0644'
+
+    - name: Restart named service to apply changes
+      systemd:
+        name: named
+        state: restarted
+  when: inventory_hostname == "server1"
+
+

@@ -1,0 +1,14 @@
+$TTL 86400
+@       IN  SOA     example.com. root.example.com. (
+                        2025091501 ; Serial
+                        1D         ; Refresh
+                        1H         ; Retry
+                        1W         ; Expire
+                        3H )       ; Minimum
+
+        IN  NS      main.example.com.
+
+10      IN  PTR     main.example.com.
+20      IN  PTR     server1.example.com.
+30      IN  PTR     ansible1.example.com.
+

@@ -1,0 +1,7 @@
+---
+- name: Include DNS setup tasks
+  include_tasks: dns.yml
+
+- name: Include resolv.conf setup tasks
+  include_tasks: resolv.yml
+

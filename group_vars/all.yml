@@ -1,0 +1,8 @@
+ # DNS
+ dns_pkg: bind
+ dns_service: named
+ dns_fw: dns
+ # FTP
+ ftp_pkg: vsftpd
+ ftp_service: vsftpd
+ ftp_fw: ftp

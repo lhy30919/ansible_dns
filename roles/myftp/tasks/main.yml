@@ -1,0 +1,36 @@
+---
+# FTP Role: 패키지, 서비스, 설정 관리
+- name: 패키지 설치
+  yum:
+    name:
+      - '{{ ftp_pkg }}'
+      - epel-release
+    state: present
+
+- name: FTP 서비스 기동
+  systemd:
+    name: '{{ ftp_service }}'
+    enabled: yes
+    state: started
+
+- name: ftpusers 파일 수정
+  lineinfile:
+    path: /etc/vsftpd/ftpusers
+    regexp: 'root'
+    line: '#root'
+    backrefs: yes
+
+- name: user_list 파일 수정
+  lineinfile:
+    path: /etc/vsftpd/user_list
+    regexp: 'root'
+    line: '#root'
+    backrefs: yes
+
+- name: /etc/ssh/sshd_config 파일 수정
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '#PermitRootLogin prohibit-password'
+    line: 'PermitRootLogin yes'
+    backrefs: yes
+

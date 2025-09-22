@@ -1,0 +1,8 @@
+# DNS + FTP
+[localhost]
+localhost ansible_connection=local
+
+[server1]
+server1 ansible_host=192.168.10.11
+[ansible1]
+ansible1 ansible_host=192.168.10.12
